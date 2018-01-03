@@ -16,6 +16,7 @@ int getfilecontent(char **buf,char filename[],int unset){
         fseek(fp,0,SEEK_END);//获取文件大小
         lsize = ftell(fp);
         rewind(fp);
+        buf = (char*) malloc(sizeof(char)*lsize);
         if(buf == NULL){
             printf("文件为空\n");
             exit(0);
@@ -24,19 +25,17 @@ int getfilecontent(char **buf,char filename[],int unset){
             if(fread(buf,1,lsize,fp) != lsize){
                 printf("读取失败\n");
                 exit(0);
-            }else{
-                // 关闭文件
-                fclose(fp);
             }
         }
     }
     printf(buf);
+    fclose(fp);
     if(unset == 1) memset(buf,0,sizeof(buf));
     return 0;
 }
 
 int main(){
-    char buf[]={0};
+    char *buf[]={0};
     char str[] = "abc";
     char user[30] = "fuck";
     char passwd[30] = "abcd123";

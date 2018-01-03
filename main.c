@@ -1,43 +1,57 @@
 #include <stdio.h>
+#include <errno.h>
 #include <string.h>
+#include <stdlib.h>
+extern int errno ;
 
-int getfilecontent(char **buf,char filename[]){
-    printf(filename);
+int getfilecontent(char **buf,char filename[],int unset){
+    FILE *fp = NULL;
+    long lsize;
+    //printf("%s \n",filename);
+    fp = fopen(filename, "rb");
+    if(fp == NULL){
+        printf("%s\n",strerror(errno));
+        exit(0);
+    }else{
+        fseek(fp,0,SEEK_END);//获取文件大小
+        lsize = ftell(fp);
+        rewind(fp);
+        if(buf == NULL){
+            printf("文件为空\n");
+            exit(0);
+        }else{
+            // 读取文件内容保存到指针变量
+            if(fread(buf,1,lsize,fp) != lsize){
+                printf("读取失败\n");
+                exit(0);
+            }else{
+                // 关闭文件
+                fclose(fp);
+            }
+        }
+    }
     printf(buf);
-    //buf = "爱仕达萨达";
-    strcpy(buf,"爱仕达萨达");
+    if(unset == 1) memset(buf,0,sizeof(buf));
     return 0;
 }
 
 int main(){
-    printf("00000000\n");
-    char buf[255]={0};
+    char buf[]={0};
     char str[] = "abc";
     char user[30] = "fuck";
     char passwd[30] = "abcd123";
-    FILE *fp = NULL;
-    strcpy(buf, "安师大");
-    memset( &buf, 0, sizeof(buf) );
-    char f[] = "./welcome_ui.txt";
-    getfilecontent(&buf,"./welcome_ui.txt");
-    //exit(0);
-    //getch();//等待终端输入任意字符
-    printf(buf);
-    exit(0);//退出程序
-    printf(
-           "************请登录**************\
-           \n* 你需要进行py方可进入系统\
-           \n*\
-           \n* 请输入用户名: \n");
-    scanf("%30s",&buf);
-    if(strcmp(buf,user)==0){
+    char input[30] = {0};
+    getfilecontent(&buf,"/Users/existence/Desktop/c语言学习/C语言学习/login.txt",1);
+    
+    scanf("%30s",&input);
+    printf("%s == %s",input,user);
+    if(strcmp(input,user)==0){
         printf("\n* 请输入密码: \n");
-        scanf("%30s",&buf);
-        if(strcmp(buf,passwd)==0){
+        scanf("%30s",&input);
+        if(strcmp(input,passwd)==0){
             printf("登录成功");
-            fp = fopen("welcome_ui.txt", "rb");
-            fgets(buf, 255, (FILE*)fp);
-            fclose(fp);
+            
+            getfilecontent(&buf,"/Users/existence/Desktop/c语言学习/C语言学习/welcome_ui.txt",1);
         }else{
             printf("密码错误,请重新输入");
         }
